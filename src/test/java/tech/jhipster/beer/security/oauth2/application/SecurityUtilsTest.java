@@ -239,8 +239,7 @@ class SecurityUtilsTest {
 
     Map<String, Object> attributes = SecurityUtils.getAttributes(token);
 
-    assertThat(attributes).isNotEmpty();
-    assertThat(attributes).containsEntry("preferred_username", "admin");
+    assertThat(attributes).isNotEmpty().containsEntry("preferred_username", "admin");
   }
 
   @Test
@@ -250,8 +249,7 @@ class SecurityUtilsTest {
 
     Map<String, Object> attributes = SecurityUtils.getAttributes(token);
 
-    assertThat(attributes).isNotEmpty();
-    assertThat(attributes).containsEntry("preferred_username", "admin");
+    assertThat(attributes).isNotEmpty().containsEntry("preferred_username", "admin");
   }
 
   @Test

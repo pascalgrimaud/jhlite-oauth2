@@ -1,22 +1,22 @@
 {
   "name": "beer",
-  "devDependencies": {
-    "prettier-plugin-packagejson": "2.2.16",
-    "prettier-plugin-java": "1.6.1",
-    "prettier": "2.5.1",
-    "lint-staged": "12.3.5",
-    "husky": "7.0.4",
-    "@prettier/plugin-xml": "1.2.0"
-  },
-  "scripts": {
-    "prettier:check": "prettier --check \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java,xml}\"",
-    "prepare": "husky install",
-    "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java,xml}\""
-  },
   "version": "0.0.0",
   "private": true,
   "description": "Beer Project",
   "license": "UNLICENSED",
+  "scripts": {
+    "prepare": "husky install",
+    "prettier:check": "prettier --check \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java,xml}\"",
+    "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml,html,js,ts,tsx,css,scss,vue,java,xml}\""
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "1.2.0",
+    "husky": "7.0.4",
+    "lint-staged": "12.3.5",
+    "prettier": "2.5.1",
+    "prettier-plugin-java": "1.6.1",
+    "prettier-plugin-packagejson": "2.2.16"
+  },
   "engines": {
     "node": ">=16.13.0"
   },

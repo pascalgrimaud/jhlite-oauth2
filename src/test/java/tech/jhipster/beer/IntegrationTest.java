@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.springframework.boot.test.context.SpringBootTest;
-import tech.jhipster.beer.security.oauth2.infrastructure.config.TestSecurityConfiguration;
 import org.springframework.security.test.context.support.WithMockUser;
+import tech.jhipster.beer.security.oauth2.infrastructure.config.TestSecurityConfiguration;
 
 @DisplayNameGeneration(ReplaceCamelCase.class)
 @Retention(RetentionPolicy.RUNTIME)

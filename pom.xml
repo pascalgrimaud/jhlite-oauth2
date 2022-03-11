@@ -40,6 +40,8 @@
     <spring-boot.version>2.6.4</spring-boot.version>
     <problem-spring.version>0.27.0</problem-spring.version>
     <problem-spring-web.version>${problem-spring.version}</problem-spring-web.version>
+    <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
+    <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
     <!-- jhipster-needle-maven-property -->
   </properties>
 
@@ -211,6 +213,24 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>${properties-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>sonar-project.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- jhipster-needle-maven-add-plugin -->
     </plugins>
     <pluginManagement>
@@ -330,6 +350,11 @@
           <configuration>
             <mainClass>${start-class}</mainClass>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${sonar-maven-plugin.version}</version>
         </plugin>
         <!-- jhipster-needle-maven-add-plugin-management -->
       </plugins>

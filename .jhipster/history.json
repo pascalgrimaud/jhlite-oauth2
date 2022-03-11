@@ -11,5 +11,7 @@
     "serviceId" : "springboot-tomcat"
   }, {
     "serviceId" : "springboot-oauth2"
+  }, {
+    "serviceId" : "sonar-java-backend"
   } ]
 }

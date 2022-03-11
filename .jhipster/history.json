@@ -13,5 +13,7 @@
     "serviceId" : "springboot-oauth2"
   }, {
     "serviceId" : "sonar-java-backend"
+  }, {
+    "serviceId" : "jacoco-check-min-coverage"
   } ]
 }

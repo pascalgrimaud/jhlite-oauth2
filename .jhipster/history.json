@@ -1,0 +1,13 @@
+{
+  "values" : [ {
+    "serviceId" : "init"
+  }, {
+    "serviceId" : "maven"
+  }, {
+    "serviceId" : "java-base"
+  }, {
+    "serviceId" : "springboot"
+  }, {
+    "serviceId" : "springboot-tomcat"
+  } ]
+}

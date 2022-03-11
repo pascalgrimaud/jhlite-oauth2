@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.zalando.problem.*;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
+import org.zalando.problem.spring.web.advice.security.SecurityAdviceTrait;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 
 /**
@@ -24,7 +25,7 @@ import org.zalando.problem.violations.ConstraintViolationProblem;
  * The error response follows RFC7807 - Problem Details for HTTP APIs (https://tools.ietf.org/html/rfc7807).
  */
 @ControllerAdvice
-public class ExceptionTranslator implements ProblemHandling {
+public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait {
 
   private static final String FIELD_ERRORS_KEY = "fieldErrors";
   private static final String MESSAGE_KEY = "message";

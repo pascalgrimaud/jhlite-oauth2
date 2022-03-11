@@ -15,5 +15,7 @@
     "serviceId" : "sonar-java-backend"
   }, {
     "serviceId" : "jacoco-check-min-coverage"
+  }, {
+    "serviceId" : "github-actions"
   } ]
 }

@@ -5,8 +5,10 @@ import static org.springframework.security.oauth2.core.oidc.endpoint.OidcParamet
 
 import java.time.Instant;
 import java.util.*;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +25,8 @@ import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import tech.jhipster.beer.UnitTest;
+import tech.jhipster.beer.error.domain.MissingMandatoryValueException;
+import tech.jhipster.beer.error.domain.UnauthorizedValueException;
 import tech.jhipster.beer.security.oauth2.domain.AuthoritiesConstants;
 
 @UnitTest
@@ -53,10 +57,8 @@ class SecurityUtilsTest {
   @Test
   void shouldGetCurrentUserLoginWithUserDetails() {
     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-    Collection<GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
-    User user = new User("admin", "admin", authorities);
-    securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(user, "admin", authorities));
+    UsernamePasswordAuthenticationToken token = buildUsernamePasswordAuthenticationToken();
+    securityContext.setAuthentication(token);
     SecurityContextHolder.setContext(securityContext);
     Optional<String> login = SecurityUtils.getCurrentUserLogin();
     assertThat(login).contains("admin");
@@ -67,17 +69,7 @@ class SecurityUtilsTest {
   @Test
   void shouldGetCurrentUserLoginWithJwtAuthenticationToken() {
     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-
-    Jwt jwt = Jwt
-      .withTokenValue("token")
-      .header("alg", JwsAlgorithms.RS256)
-      .subject("jhipster")
-      .claim("preferred_username", "admin")
-      .build();
-    Collection<GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
-    JwtAuthenticationToken token = new JwtAuthenticationToken(jwt, authorities);
-
+    JwtAuthenticationToken token = buildJwtAuthenticationToken();
     securityContext.setAuthentication(token);
     SecurityContextHolder.setContext(securityContext);
 
@@ -89,15 +81,7 @@ class SecurityUtilsTest {
   @Test
   void shouldGetCurrentUserLoginForOAuth2() {
     SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("groups", AuthoritiesConstants.USER);
-    claims.put("sub", 123);
-    claims.put("preferred_username", "admin");
-    OidcIdToken idToken = new OidcIdToken(ID_TOKEN, Instant.now(), Instant.now().plusSeconds(60), claims);
-    Collection<GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
-    OidcUser user = new DefaultOidcUser(authorities, idToken);
-    OAuth2AuthenticationToken auth2AuthenticationToken = new OAuth2AuthenticationToken(user, authorities, "oidc");
+    OAuth2AuthenticationToken auth2AuthenticationToken = buildOAuth2AuthenticationToken();
     securityContext.setAuthentication(auth2AuthenticationToken);
     SecurityContextHolder.setContext(securityContext);
 
@@ -246,5 +230,71 @@ class SecurityUtilsTest {
 
     assertThat(SecurityUtils.hasCurrentUserNoneOfAuthorities(AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)).isFalse();
     assertThat(SecurityUtils.hasCurrentUserNoneOfAuthorities(AuthoritiesConstants.ANONYMOUS, AuthoritiesConstants.ADMIN)).isTrue();
+  }
+
+  @Test
+  @DisplayName("should get attributes for OAuth2")
+  void shouldGetAttributesForOAuth2() {
+    OAuth2AuthenticationToken token = buildOAuth2AuthenticationToken();
+
+    Map<String, Object> attributes = SecurityUtils.getAttributes(token);
+
+    assertThat(attributes).isNotEmpty();
+    assertThat(attributes).containsEntry("preferred_username", "admin");
+  }
+
+  @Test
+  @DisplayName("should get attributes for JWT")
+  void shouldGetAttributesForJWT() {
+    JwtAuthenticationToken token = buildJwtAuthenticationToken();
+
+    Map<String, Object> attributes = SecurityUtils.getAttributes(token);
+
+    assertThat(attributes).isNotEmpty();
+    assertThat(attributes).containsEntry("preferred_username", "admin");
+  }
+
+  @Test
+  void shouldNotGetAttributesForAnotherToken() {
+    UsernamePasswordAuthenticationToken token = buildUsernamePasswordAuthenticationToken();
+
+    Assertions.assertThatThrownBy(() -> SecurityUtils.getAttributes(token)).isExactlyInstanceOf(UnauthorizedValueException.class);
+  }
+
+  @Test
+  void shouldNotGetAttributesForNull() {
+    Assertions.assertThatThrownBy(() -> SecurityUtils.getAttributes(null)).isExactlyInstanceOf(MissingMandatoryValueException.class);
+  }
+
+  private OAuth2AuthenticationToken buildOAuth2AuthenticationToken() {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("groups", AuthoritiesConstants.USER);
+    claims.put("sub", 123);
+    claims.put("preferred_username", "admin");
+    OidcIdToken idToken = new OidcIdToken(ID_TOKEN, Instant.now(), Instant.now().plusSeconds(60), claims);
+    Collection<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.USER));
+    OidcUser user = new DefaultOidcUser(authorities, idToken);
+    return new OAuth2AuthenticationToken(user, authorities, "oidc");
+  }
+
+  private JwtAuthenticationToken buildJwtAuthenticationToken() {
+    Jwt jwt = Jwt
+      .withTokenValue("token")
+      .header("alg", JwsAlgorithms.RS256)
+      .subject("jhipster")
+      .claim("preferred_username", "admin")
+      .build();
+    Collection<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+    return new JwtAuthenticationToken(jwt, authorities);
+  }
+
+  private UsernamePasswordAuthenticationToken buildUsernamePasswordAuthenticationToken() {
+    Collection<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+    User user = new User("admin", "admin", authorities);
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user, "admin", authorities);
+    return token;
   }
 }

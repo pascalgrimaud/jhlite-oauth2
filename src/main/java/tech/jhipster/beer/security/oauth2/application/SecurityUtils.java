@@ -3,14 +3,18 @@ package tech.jhipster.beer.security.oauth2.application;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import tech.jhipster.beer.error.domain.Assert;
+import tech.jhipster.beer.error.domain.UnauthorizedValueException;
 import tech.jhipster.beer.security.oauth2.domain.AuthoritiesConstants;
 
 /**
@@ -127,5 +131,15 @@ public final class SecurityUtils {
   @SuppressWarnings("java:S6204")
   private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<String> roles) {
     return roles.stream().filter(role -> role.startsWith("ROLE_")).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+  }
+
+  public static Map<String, Object> getAttributes(AbstractAuthenticationToken token) {
+    Assert.notNull("token", token);
+    if (token instanceof OAuth2AuthenticationToken oAuth2AuthenticationToken) {
+      return oAuth2AuthenticationToken.getPrincipal().getAttributes();
+    } else if (token instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+      return jwtAuthenticationToken.getTokenAttributes();
+    }
+    throw new UnauthorizedValueException("AuthenticationToken is not OAuth2 or JWT!");
   }
 }

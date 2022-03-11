@@ -1,6 +1,6 @@
 package tech.jhipster.beer.account.infrastructure.primary.rest;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames.ID_TOKEN;
 
 import java.time.Instant;
@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import tech.jhipster.beer.UnitTest;
-import tech.jhipster.beer.security.oauth2.application.SecurityUtils;
 import tech.jhipster.beer.security.oauth2.domain.AuthoritiesConstants;
 
 @UnitTest
@@ -152,7 +151,7 @@ class UserDTOTest {
   }
 
   @Test
-  void shouldGetUserWithSubEmailAndAnotherLocale() {
+  void shouldGetUserWithSubEmailAndLocaleWithDash() {
     Map<String, Object> claims = new HashMap<>();
 
     claims.put("uid", "4c973896-5761-41fc-8217-07c5d13a004b");
@@ -168,6 +167,66 @@ class UserDTOTest {
     UserDTO result = UserDTO.getUserDTOFromToken(oauth2AuthenticationToken);
 
     assertThat(result.getEmail()).isEqualTo("admin@localhost");
+    assertThat(result.getLangKey()).isEqualTo("fr");
+  }
+
+  @Test
+  void shouldGetUserWithSubEmailAndLocale() {
+    Map<String, Object> claims = new HashMap<>();
+
+    claims.put("uid", "4c973896-5761-41fc-8217-07c5d13a004b");
+    claims.put("preferred_username", "admin@localhost");
+    claims.put("sub", "admin@localhost|information");
+    claims.put("locale", "fr");
+
+    OidcIdToken idToken = new OidcIdToken(ID_TOKEN, Instant.now(), Instant.now().plusSeconds(60), claims);
+    Collection<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+    OidcUser user = new DefaultOidcUser(authorities, idToken);
+    OAuth2AuthenticationToken oauth2AuthenticationToken = new OAuth2AuthenticationToken(user, authorities, "oidc");
+
+    UserDTO result = UserDTO.getUserDTOFromToken(oauth2AuthenticationToken);
+
+    assertThat(result.getEmail()).isEqualTo("admin@localhost");
+    assertThat(result.getLangKey()).isEqualTo("fr");
+  }
+
+  @Test
+  void shouldGetUserWithSubUsernameNotContainArobase() {
+    Map<String, Object> claims = new HashMap<>();
+
+    claims.put("uid", "4c973896-5761-41fc-8217-07c5d13a004b");
+    claims.put("preferred_username", "admin");
+    claims.put("sub", "admin@localhost|information");
+    claims.put("locale", "fr");
+
+    OidcIdToken idToken = new OidcIdToken(ID_TOKEN, Instant.now(), Instant.now().plusSeconds(60), claims);
+    Collection<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+    OidcUser user = new DefaultOidcUser(authorities, idToken);
+    OAuth2AuthenticationToken oauth2AuthenticationToken = new OAuth2AuthenticationToken(user, authorities, "oidc");
+
+    UserDTO result = UserDTO.getUserDTOFromToken(oauth2AuthenticationToken);
+
+    assertThat(result.getLangKey()).isEqualTo("fr");
+  }
+
+  @Test
+  void shouldGetUserWithSubNoUsername() {
+    Map<String, Object> claims = new HashMap<>();
+
+    claims.put("uid", "4c973896-5761-41fc-8217-07c5d13a004b");
+    claims.put("sub", "admin@localhost|information");
+    claims.put("locale", "fr");
+
+    OidcIdToken idToken = new OidcIdToken(ID_TOKEN, Instant.now(), Instant.now().plusSeconds(60), claims);
+    Collection<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority(AuthoritiesConstants.ADMIN));
+    OidcUser user = new DefaultOidcUser(authorities, idToken);
+    OAuth2AuthenticationToken oauth2AuthenticationToken = new OAuth2AuthenticationToken(user, authorities, "oidc");
+
+    UserDTO result = UserDTO.getUserDTOFromToken(oauth2AuthenticationToken);
+
     assertThat(result.getLangKey()).isEqualTo("fr");
   }
 

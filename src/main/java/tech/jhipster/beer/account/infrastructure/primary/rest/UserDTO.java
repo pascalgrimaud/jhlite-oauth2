@@ -208,7 +208,7 @@ public class UserDTO {
     }
     if (details.get("email") != null) {
       user.setEmail(((String) details.get("email")).toLowerCase());
-    } else if (sub.contains("|") && (username != null && username.contains("@"))) {
+    } else if (sub.contains("|") && username != null && username.contains("@")) {
       // special handling for Auth0
       user.setEmail(username);
     } else {
